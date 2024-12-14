@@ -110,6 +110,8 @@ public class DiagboxAdapter extends AbstractAdapter {
 
     @Override
     public void selectECU(String code) {
+        if(!isInitialized())
+            throw new RuntimeException("Adapter not initialized");
         ecuDescriptor = code;
         int a = 0;
         if((a = getStatus(sendCommand("open_session"))) < 0)

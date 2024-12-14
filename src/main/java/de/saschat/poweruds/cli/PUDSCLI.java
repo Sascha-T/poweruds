@@ -41,24 +41,24 @@ public class PUDSCLI {
         }
     }
 
+    public record UDSExecution(String ret, boolean processed) {};
 
-    public boolean processUDS(String line) {
+    public UDSExecution processUDS(String line) {
         if(adapter == null) {
             System.out.println("<# ADAPTER NOT PRESENT");
-            return false;
+            return new UDSExecution(null, false);
         }
         if(!adapter.isInitialized()) {
             System.out.println("<# ADAPTER NOT READY");
-            return false;
+            return new UDSExecution(null, false);
         }
         try {
-            adapter.sendUDS(line).get();
-            return true;
+            return new UDSExecution(adapter.sendUDS(line).get(), true);
         } catch (Throwable e) {
             exception(e);
             System.out.println("<# ADAPTER ERROR");
         }
-        return false;
+        return new UDSExecution(null, false);
     }
 
     public void processCommand(String line) {
@@ -78,5 +78,9 @@ public class PUDSCLI {
 
     public void setAdapter(AbstractAdapter adapter) {
         this.adapter = adapter;
+    }
+
+    public AbstractAdapter getAdapter() {
+        return this.adapter;
     }
 }
