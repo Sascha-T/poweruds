@@ -1,5 +1,14 @@
 plugins {
-    id 'java'
+    id "java"
+    id "application"
+}
+
+application {
+    mainClassName = "de.saschat.poweruds.PowerUDS"
+}
+
+run {
+    standardInput = System.in
 }
 
 group = 'de.saschat'
