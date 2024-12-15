@@ -18,19 +18,7 @@ public class DiagboxAdapter extends AbstractAdapter {
 
     private static String _DESC(String in) {
         String[] part = in.split(":");
-        byte[] output = new byte[4];
-        int a = Integer.valueOf(part[0], 16);
-        int b = Integer.valueOf(part[1], 16);
-
-        output[0] = (byte) ((a & 0xFF00) >> 8);
-        output[1] = (byte) (a & 0xFF);
-        output[2] = (byte) ((b & 0xFF00) >> 8);
-        output[3] = (byte) (b & 0xFF);
-
-        StringBuilder out = new StringBuilder();
-        for (byte b1 : output)
-            out.append(String.format("%02X", b1));
-        return out.toString();
+        return String.format("%4s%4s", part[1], part[0]).replaceAll(" ", "0");
     }
 
     @Override

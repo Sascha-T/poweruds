@@ -25,7 +25,7 @@ public class ECUCommand implements Command {
 
     @Override
     public String getDescription() {
-        return "[ecu:ecu] => Select ECU";
+        return "[txh:rxh] => Select ECU";
     }
 
     @Override
