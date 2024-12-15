@@ -118,7 +118,7 @@ public class DiagboxAdapter extends AbstractAdapter {
             throw new DiagboxActiaException(a);
         if((a = getStatus(sendCommand("change_com_line", "17"))) < 0)
             throw new DiagboxActiaException(a);
-        if((a = getStatus(sendCommand("bind_protocol", "3"))) < 0)
+        if((a = getStatus(sendCommand("bind_protocol", "0310E8"))) < 0)
             throw new DiagboxActiaException(a);
     }
 
