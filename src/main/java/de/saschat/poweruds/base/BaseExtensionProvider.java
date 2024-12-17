@@ -3,6 +3,7 @@ package de.saschat.poweruds.base;
 import de.saschat.poweruds.PowerUDS;
 import de.saschat.poweruds.base.adapters.DiagboxAdapter;
 import de.saschat.poweruds.base.commands.AdapterCommand;
+import de.saschat.poweruds.base.commands.BluetoothCommand;
 import de.saschat.poweruds.base.commands.ECUCommand;
 import de.saschat.poweruds.base.commands.HelpCommand;
 import de.saschat.poweruds.cli.PUDSCLI;
@@ -19,5 +20,6 @@ public class BaseExtensionProvider implements ExtensionProvider {
         cli.registerCommand(new HelpCommand());
         cli.registerCommand(new AdapterCommand());
         cli.registerCommand(new ECUCommand());
+        cli.registerCommand(new BluetoothCommand());
     }
 }

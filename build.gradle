@@ -19,8 +19,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation 'net.sf.bluecove:bluecove:2.1.0'
 }
 
 test {
