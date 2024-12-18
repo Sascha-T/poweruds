@@ -109,13 +109,13 @@ public class DiagboxAdapter extends AbstractAdapter {
             try {
                 sendCommand("close_session");
             } catch(Exception ignored) {}
-            Thread.sleep(250);
+            Thread.sleep(100);
             if((a = getStatus(sendCommand("open_session"))) < 0)
                 throw new DiagboxActiaException(a);
-            Thread.sleep(250);
+            Thread.sleep(100);
             if((a = getStatus(sendCommand("change_com_line", "17"))) < 0)
                 throw new DiagboxActiaException(a);
-            Thread.sleep(250);
+            Thread.sleep(100);
             if((a = getStatus(sendCommand("bind_protocol", "0310E8"))) < 0)
                 throw new DiagboxActiaException(a);
             Thread.sleep(100);

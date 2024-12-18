@@ -200,7 +200,7 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
 
     @Override
     public boolean isInitialized() {
-        return initialized && connected;
+        return initialized && connected && READ_QUEUE != null && READ_QUEUE.isAlive();
     }
 
     @Override
