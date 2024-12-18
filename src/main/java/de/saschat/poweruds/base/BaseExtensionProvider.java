@@ -2,6 +2,7 @@ package de.saschat.poweruds.base;
 
 import de.saschat.poweruds.PowerUDS;
 import de.saschat.poweruds.base.adapters.DiagboxAdapter;
+import de.saschat.poweruds.base.adapters.ELM327Adapter;
 import de.saschat.poweruds.base.commands.AdapterCommand;
 import de.saschat.poweruds.base.commands.BluetoothCommand;
 import de.saschat.poweruds.base.commands.ECUCommand;
@@ -13,6 +14,7 @@ public class BaseExtensionProvider implements ExtensionProvider {
     @Override
     public void provideAdapters(PowerUDS uds) {
         uds.register(new DiagboxAdapter());
+        uds.register(new ELM327Adapter());
     }
 
     @Override

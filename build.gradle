@@ -11,6 +11,7 @@ run {
     standardInput = System.in
 }
 
+
 group = 'de.saschat'
 version = '1.0-SNAPSHOT'
 
