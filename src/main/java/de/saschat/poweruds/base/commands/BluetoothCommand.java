@@ -18,6 +18,7 @@ public class BluetoothCommand implements Command {
             bt.inquire(false);
             for (Map.Entry<String, RemoteDevice> r : bt.DEVICES.entrySet()) {
                 System.out.printf("\t\t%s (%s): %s", r.getKey(), r.getValue().getBluetoothAddress(), bt.AVAILABLE.get(r.getValue()) != null ? " is a valid adapter" : " is not a valid adapter");
+                System.out.println();
             }
         }
     }
