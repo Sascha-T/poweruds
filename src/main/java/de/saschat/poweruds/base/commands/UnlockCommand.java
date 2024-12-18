@@ -5,17 +5,25 @@ import de.saschat.poweruds.adapter.AbstractAdapter;
 import de.saschat.poweruds.cli.Command;
 import de.saschat.poweruds.cli.PUDSCLI;
 
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
 public class UnlockCommand implements Command {
 
     // 100% stolen from prototux: https://github.com/prototux/PSA-RE/blob/master/sandbox/uds_auth_algorithm.c
-    private static byte[] SEC_1 = new byte[] {(byte) 0xB2, 0x3F, (byte) 0xAA};
-    private static byte[] SEC_2 = new byte[] {(byte) 0xB1, 0x02, (byte) 0xAB};
-    private static short transform(byte data_msb, byte data_lsb, byte[] sec) {
-        short data = (short) ((short) (data_msb << 8) | (short) data_lsb);
-        System.out.printf("%02X%02X\n", data_msb, data_lsb);
-        int result = ((data % sec[0]) * sec[2]) - ((data / sec[0]) * sec[1]);
+    private static short[] SEC_1 = new short[] {0xB2, 0x3F, 0xAA};
+    private static short[] SEC_2 = new short[] {0xB1, 0x02, 0xAB};
+    private static short transform(byte data_msb, byte data_lsb, short[] sec) {
+        int data = (Byte.toUnsignedInt(data_msb) << 8) | Byte.toUnsignedInt(data_lsb);
+        if (data > 32767) {
+            data = -(32768 - (data % 32768));
+        }
+
+        int a = (((data % sec[0]) * sec[2]) & 0xFFFFFFF);
+        int b = (((data / sec[0]) & 0xFFFFFFF) * sec[1]) & 0xFFFFFFF;
+
+        int result = (int) (a - b);
+
         if(result < 0)
             result += (sec[0] * sec[2]) + sec[1];
         return (short) result;
