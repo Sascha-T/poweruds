@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'net.sf.bluecove:bluecove:2.1.1'
+    implementation 'io.ultreia:bluecove:2.1.1'
 }
 
 test {
