@@ -14,7 +14,7 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
 
     private static javax.bluetooth.UUID[] SERVICES = new javax.bluetooth.UUID[]{new javax.bluetooth.UUID("0000110100001000800000805F9B34FB", false)};
     private static LocalDevice DEVICE;
-    private static DiscoveryAgent AGENT = DEVICE.getDiscoveryAgent();
+    private static DiscoveryAgent AGENT;
 
     private static boolean initialized = false;
     private boolean connected = false;
@@ -23,6 +23,7 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
     static {
         try {
             DEVICE = LocalDevice.getLocalDevice();
+            AGENT  = DEVICE.getDiscoveryAgent();
             initialized = true;
         } catch (BluetoothStateException e) {
             PUDSCLI.exception(e);
