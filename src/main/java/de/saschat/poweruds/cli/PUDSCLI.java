@@ -16,7 +16,7 @@ public class PUDSCLI {
     private AbstractAdapter adapter = null;
 
     public static void exception(Throwable e) {
-        if(System.getProperty("pudscli.debug") != null)
+        //if(System.getProperty("pudscli.debug") != null)
             e.printStackTrace();
     }
 
@@ -36,7 +36,9 @@ public class PUDSCLI {
             if (line.startsWith(".")) {
                 processCommand(line.substring(1));
             } else {
-                processUDS(line);
+                UDSExecution x = processUDS(line);
+                if(x.processed())
+                    System.out.println(x.ret());
             }
         }
     }
@@ -53,7 +55,8 @@ public class PUDSCLI {
             return new UDSExecution(null, false);
         }
         try {
-            return new UDSExecution(adapter.sendUDS(line).get(), true);
+            String ret = adapter.sendUDS(line).get();
+            return new UDSExecution(ret, true);
         } catch (Throwable e) {
             exception(e);
             System.out.println("<# ADAPTER ERROR");

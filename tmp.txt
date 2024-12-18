@@ -1,0 +1,4 @@
+open_session
+change_com_line|17
+bind_protocol|0310E8
+write_and_read|06520752|1003|1000

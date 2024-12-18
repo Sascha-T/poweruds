@@ -13,7 +13,8 @@ public class UnlockCommand implements Command {
     private static byte[] SEC_1 = new byte[] {(byte) 0xB2, 0x3F, (byte) 0xAA};
     private static byte[] SEC_2 = new byte[] {(byte) 0xB1, 0x02, (byte) 0xAB};
     private static short transform(byte data_msb, byte data_lsb, byte[] sec) {
-        short data = (short) ((data_msb << 8) | data_lsb);
+        short data = (short) ((short) (data_msb << 8) | (short) data_lsb);
+        System.out.printf("%02X%02X\n", data_msb, data_lsb);
         int result = ((data % sec[0]) * sec[2]) - ((data / sec[0]) * sec[1]);
         if(result < 0)
             result += (sec[0] * sec[2]) + sec[1];
@@ -28,16 +29,16 @@ public class UnlockCommand implements Command {
 
     private static byte[] stringToByte(String s) {
         byte[] seedBytes = new byte[4];
-        for (int i = 0; i < seedBytes.length; i++)
-            seedBytes[i] = Byte.parseByte(s.substring(i*2, (i+1)*2), 16);
+        for (int i = 0; i < s.length() / 2; i++)
+            seedBytes[i] = (byte) Integer.parseInt(s.substring(i*2, (i+1)*2), 16);
         return seedBytes;
     }
     @Override
     public void execute(PUDSCLI cli, String[] args) {
-        if(CommandHelper.exactArgs(args, CommandHelper.FAULT_ARGS, 2))
+        if(!CommandHelper.exactArgs(args, CommandHelper.FAULT_ARGS, 2))
             return;
         AbstractAdapter adapter = cli.getAdapter();
-        if(CommandHelper.needAdapter(cli, CommandHelper.FAULT_ADAPTER))
+        if(!CommandHelper.needAdapter(cli, CommandHelper.FAULT_ADAPTER))
             return;
         try {
             var diag = cli.processUDS("1003");
@@ -59,6 +60,7 @@ public class UnlockCommand implements Command {
             }
             System.out.println("\t\tSuccess!");
         } catch (Throwable e) {
+            PUDSCLI.exception(e);
             System.out.println("\tUnlocking generically failed.");
         }
     }

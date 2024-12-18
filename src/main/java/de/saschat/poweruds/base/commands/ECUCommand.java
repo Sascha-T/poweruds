@@ -11,15 +11,16 @@ public class ECUCommand implements Command {
     private static Pattern pattern = Pattern.compile("/[\\dabcdefABCDEF]{3}:[\\dabcdefABCDEF]{3}/g");
     @Override
     public void execute(PUDSCLI cli, String[] args) {
-        if(CommandHelper.exactArgs(args, CommandHelper.FAULT_ARGS, 2))
+        if(!CommandHelper.exactArgs(args, CommandHelper.FAULT_ARGS, 2))
             return;
         AbstractAdapter adapter = cli.getAdapter();
-        if(CommandHelper.needAdapter(cli, CommandHelper.FAULT_ADAPTER))
+        if(!CommandHelper.needAdapter(cli, CommandHelper.FAULT_ADAPTER))
             return;
-        if(!pattern.matcher(args[1]).matches()) {
+        /*if(!pattern.matcher(args[1]).matches()) {
             System.out.println("Invalid ECU.");
             return;
-        }
+        }*/
+        System.out.println("\tUsing: " + args[1]);
         adapter.selectECU(args[1]);
     }
 

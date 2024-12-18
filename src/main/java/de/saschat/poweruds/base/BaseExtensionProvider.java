@@ -6,6 +6,7 @@ import de.saschat.poweruds.base.adapters.ELM327Adapter;
 import de.saschat.poweruds.base.commands.AdapterCommand;
 import de.saschat.poweruds.base.commands.BluetoothCommand;
 import de.saschat.poweruds.base.commands.ECUCommand;
+import de.saschat.poweruds.base.commands.UnlockCommand;
 import de.saschat.poweruds.base.commands.HelpCommand;
 import de.saschat.poweruds.cli.PUDSCLI;
 import de.saschat.poweruds.spi.ExtensionProvider;
@@ -23,5 +24,6 @@ public class BaseExtensionProvider implements ExtensionProvider {
         cli.registerCommand(new AdapterCommand());
         cli.registerCommand(new ECUCommand());
         cli.registerCommand(new BluetoothCommand());
+        cli.registerCommand(new UnlockCommand());
     }
 }

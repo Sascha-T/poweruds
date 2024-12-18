@@ -4,8 +4,9 @@ import de.saschat.poweruds.adapter.AbstractAdapter;
 import de.saschat.poweruds.adapter.AdapterIOException;
 import de.saschat.poweruds.adapter.AdapterInitializationException;
 
+
 import java.io.*;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class DiagboxAdapter extends AbstractAdapter {
@@ -77,10 +78,12 @@ public class DiagboxAdapter extends AbstractAdapter {
         try {
             writer.write(String.join("|", cmds) + System.lineSeparator());
             writer.flush();
-            String[] read = reader.readLine().split("\\|");
-            if(read.length > 2)
-                return read[2];
-            throw new DiagboxActiaException(Integer.parseInt(read[1]));
+            String read_ = reader.readLine();
+            String[] read = read_.split("\\|");
+            int a = Integer.parseInt(read[1]);
+            if(a < 0)
+                throw new DiagboxActiaException(a);
+            return read_;
         } catch (IOException e) {
             reset();
             throw new AdapterIOException(e);
@@ -102,12 +105,23 @@ public class DiagboxAdapter extends AbstractAdapter {
             throw new RuntimeException("Adapter not initialized");
         ecuDescriptor = code;
         int a = 0;
-        if((a = getStatus(sendCommand("open_session"))) < 0)
-            throw new DiagboxActiaException(a);
-        if((a = getStatus(sendCommand("change_com_line", "17"))) < 0)
-            throw new DiagboxActiaException(a);
-        if((a = getStatus(sendCommand("bind_protocol", "0310E8"))) < 0)
-            throw new DiagboxActiaException(a);
+        try {
+            try {
+                sendCommand("close_session");
+            } catch(Exception ignored) {}
+            Thread.sleep(250);
+            if((a = getStatus(sendCommand("open_session"))) < 0)
+                throw new DiagboxActiaException(a);
+            Thread.sleep(250);
+            if((a = getStatus(sendCommand("change_com_line", "17"))) < 0)
+                throw new DiagboxActiaException(a);
+            Thread.sleep(250);
+            if((a = getStatus(sendCommand("bind_protocol", "0310E8"))) < 0)
+                throw new DiagboxActiaException(a);
+            Thread.sleep(100);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -116,7 +130,10 @@ public class DiagboxAdapter extends AbstractAdapter {
             throw new RuntimeException("Adapter not initialized");
         if(ecuDescriptor == null)
             throw new RuntimeException("ECU descriptor not set");
-        return exec.submit(() -> sendCommand("write_and_read", _DESC(ecuDescriptor), uds, "1000"));
+        return exec.submit(() -> {
+            String text = sendCommand("write_and_read", _DESC(ecuDescriptor), uds, "1000");
+            return text.split("\\|")[2];
+        });
     }
 
 }
