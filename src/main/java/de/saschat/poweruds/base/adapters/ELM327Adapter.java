@@ -7,10 +7,7 @@ import de.saschat.poweruds.cli.PUDSCLI;
 import javax.bluetooth.*;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -32,8 +29,8 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
     private boolean connected = false;
     private RemoteDevice selected;
     private StreamConnection connection;
-    private DataInputStream in;
-    private DataOutputStream out;
+    private InputStream in;
+    private OutputStream out;
 
 
     static {
@@ -74,7 +71,9 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
         if (!dnq && !inquire(true))
             return;
         if (dev != null || (dev = getDevice(options)) != null)
+            System.out.println("Dev 1");
             if (connect(dev)) {
+                System.out.println("Dev 2");
                 for (String initCommand : INIT_COMMANDS) { // initialize state
                     if(writeAndRead(initCommand).equals("?"))
                         return;
@@ -89,13 +88,14 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
         // connect
         try {
             connection = (StreamConnection) Connector.open(AVAILABLE.get(device));
-            in = connection.openDataInputStream();
-            out = connection.openDataOutputStream();
+            in = connection.openInputStream();
+            out = connection.openOutputStream();
 
             READ_QUEUE = new Thread(() -> {
                 try {
                     while(true) {
-                        char read = in.readChar();
+                        char read = (char) in.read();
+                        System.out.println("char: " + read);
                         while(!IN_QUEUE.add(read)) {
                             Thread.sleep(100);
                         }
@@ -104,6 +104,7 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
                     throw new RuntimeException(e);
                 }
             });
+            READ_QUEUE.start();
 
             connected = true;
             return true;
@@ -115,9 +116,9 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
 
     public void writeCommand(String text) {
         try {
-            for (char c : text.toCharArray()) {
-                out.write(c);
-            }
+            System.out.println("out: " + text);
+            byte[] w = text.getBytes("UTF-8");
+            out.write(w, 0, w.length);
             out.write('\n');
         } catch (IOException e) {
             PUDSCLI.exception(e);
@@ -141,7 +142,7 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
                 }
                 Thread.sleep(100);
             }
-            return "";
+            return text.toString();
         } catch (Throwable e) {
             PUDSCLI.exception(e);
             throw new RuntimeException(e);
