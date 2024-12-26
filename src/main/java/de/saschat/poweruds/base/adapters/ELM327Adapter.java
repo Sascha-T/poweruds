@@ -8,6 +8,7 @@ import javax.bluetooth.*;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -124,9 +125,10 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
     public void writeCommand(String text) {
         try {
             System.out.println("out: " + text);
-            byte[] w = text.getBytes("ASCII");
+            byte[] w = text.getBytes(StandardCharsets.US_ASCII);
             out.write(w, 0, w.length);
-            /*out.write('\n');*/
+            out.write('\n');
+
 
         } catch (IOException e) {
             PUDSCLI.exception(e);
