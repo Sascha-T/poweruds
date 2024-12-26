@@ -117,9 +117,10 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
     public void writeCommand(String text) {
         try {
             System.out.println("out: " + text);
-            byte[] w = text.getBytes("UTF-8");
+            byte[] w = text.getBytes("ASCII");
             out.write(w, 0, w.length);
-            out.write('\n');
+            /*out.write('\n');*/
+
         } catch (IOException e) {
             PUDSCLI.exception(e);
             throw new RuntimeException(e);
