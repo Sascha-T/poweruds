@@ -16,6 +16,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener {
     private final Object lock = new Object();
@@ -44,7 +45,7 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
     }
 
     private static final String[] INIT_COMMANDS = new String[] {
-            "ATZ", "ATWS", "ATD", "ATE0", "ATL0", "ATH0", "ATS0", "ATAL", "ATV0", "ATSP6"
+            "AT L1", "AT Z", "AT L1", "AT WS", "AT D", "AT E0", /*"AT L0" no,*/ "AT H0", "AT S0", "AT AL", "AT V0", "AT SP6"
     };
 
     public Map<String, RemoteDevice> DEVICES = new HashMap<>();
@@ -52,6 +53,7 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
 
     public Queue<Character> IN_QUEUE = new ArrayBlockingQueue<>(1024);
     public Thread READ_QUEUE;
+    public AtomicInteger READ_QUEUE_INDEX = new AtomicInteger(0);
 
     @Override
     public String getName() {
@@ -70,16 +72,17 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
         boolean dnq = (dev = getDevice(options)) != null;
         if (!dnq && !inquire(true))
             return;
-        if (dev != null || (dev = getDevice(options)) != null)
+        if (dev != null || (dev = getDevice(options)) != null) {
             System.out.println("Dev 1");
             if (connect(dev)) {
                 System.out.println("Dev 2");
                 for (String initCommand : INIT_COMMANDS) { // initialize state
-                    if(writeAndRead(initCommand).equals("?"))
+                    if (writeAndRead(initCommand).equals("?"))
                         return;
                 }
                 initialized = true;
             }
+        }
     }
 
     public boolean connect(RemoteDevice device) {
@@ -94,11 +97,15 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
             READ_QUEUE = new Thread(() -> {
                 try {
                     while(true) {
-                        char read = (char) in.read();
-                        System.out.println("char: " + read);
-                        while(!IN_QUEUE.add(read)) {
-                            Thread.sleep(100);
-                        }
+                        boolean reading = true;
+                        if(READ_QUEUE_INDEX.get() > 0)
+                            while(reading) {
+                                char read = (char) in.read();
+                                System.out.println("char: " + read);
+                                IN_QUEUE.add(read);
+                                if(read == '\n')
+                                    reading = false;
+                            }
                     }
                 } catch (Throwable e) {
                     throw new RuntimeException(e);
@@ -128,6 +135,7 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
     public String readReply() {
         StringBuilder text = new StringBuilder();
         try {
+            READ_QUEUE_INDEX.addAndGet(1);
             for (int i = 0; i < 20; i++) {
                 if(!IN_QUEUE.isEmpty()) {
                     if(IN_QUEUE.contains('\n')) {
