@@ -57,15 +57,17 @@ public class DiagboxAdapter extends AbstractAdapter {
     private void doKeepAlive() {
         if(!openSession || ecuDescriptor == null)
             return;
-        boolean success = false;
-        try {
-            writer.write(String.format("write_and_read|%s|%s|1000%s", _DESC(ecuDescriptor), "3E00", System.lineSeparator()));
-            writer.flush();
-            if(reader.readLine().split("\\|").length > 2)
-                success = true;
-        } catch (IOException x) { reset(); }
-        if(!success) {
-            openSession = false;
+        while(openSession) {
+            boolean success = false;
+            try {
+                writer.write(String.format("write_and_read|%s|%s|1000%s", _DESC(ecuDescriptor), "3E00", System.lineSeparator()));
+                writer.flush();
+                if(reader.readLine().split("\\|").length > 2)
+                    success = true;
+            } catch (IOException x) { reset(); }
+            if(!success) {
+                openSession = false;
+            }
         }
     }
 
