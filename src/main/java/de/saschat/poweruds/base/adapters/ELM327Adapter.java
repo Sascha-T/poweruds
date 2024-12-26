@@ -46,7 +46,7 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
     }
 
     private static final String[] INIT_COMMANDS = new String[] {
-            "AT L1", "AT Z", "AT L1", "AT WS", "AT D", "AT E0", /*"AT L0" no,*/ "AT H0", "AT S0", "AT AL", "AT V0", "AT SP6"
+            "AT L1", "AT Z", "AT L1", "AT WS", "AT D", "AT E0", /*"AT L0" no,*/ "AT H0", "AT S0", "AT AL", "AT V0", "AT SP 6"
     };
 
     public Map<String, RemoteDevice> DEVICES = new HashMap<>();
@@ -139,7 +139,7 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
         StringBuilder text = new StringBuilder();
         try {
             READ_QUEUE_INDEX.addAndGet(1);
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 5; i++) {
                 if(!IN_QUEUE.isEmpty()) {
                     if(IN_QUEUE.contains('\n')) {
                         // consume one line
@@ -151,7 +151,7 @@ public class ELM327Adapter extends AbstractAdapter implements DiscoveryListener 
                         return text.toString();
                     }
                 }
-                Thread.sleep(100);
+                Thread.sleep(1000);
             }
             return text.toString();
         } catch (Throwable e) {
