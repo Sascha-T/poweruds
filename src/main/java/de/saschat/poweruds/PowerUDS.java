@@ -12,10 +12,7 @@ public class PowerUDS {
     private static final ServiceLoader<ExtensionProvider> LOADER = ServiceLoader.load(ExtensionProvider.class);
 
     public static void main(String[] args) {
-        byte[] seed = new byte[] {0x0D, 0x16, 0x61, 0x46};
-        byte[] key = new byte[] {(byte) 0xB4, (byte) 0xE0};
-        System.out.println(UnlockCommand.compute(key, seed));
-        // new PowerUDS().startCLI(args);
+        new PowerUDS().startCLI(args);
     }
     private PUDSCLI cli;
     public PowerUDS() {
