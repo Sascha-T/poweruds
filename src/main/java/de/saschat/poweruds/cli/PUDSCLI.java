@@ -96,7 +96,6 @@ public class PUDSCLI {
     public record UDSExecution(String ret, boolean processed) {
     }
 
-    ;
 
     public UDSExecution processUDS(String line) {
         if (adapter == null) {

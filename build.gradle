@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.ultreia:bluecove:2.1.1'
+    implementation 'com.google.code.gson:gson:2.7'
 }
 
 test {

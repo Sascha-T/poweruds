@@ -1,11 +1,23 @@
 package de.saschat.poweruds.base.commands;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import de.saschat.poweruds.CommandHelper;
 import de.saschat.poweruds.adapter.AbstractAdapter;
 import de.saschat.poweruds.cli.Command;
 import de.saschat.poweruds.cli.PUDSCLI;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class UnlockCommand implements Command {
@@ -41,17 +53,68 @@ public class UnlockCommand implements Command {
             seedBytes[i] = (byte) Integer.parseInt(s.substring(i*2, (i+1)*2), 16);
         return seedBytes;
     }
+
+    private static Map<String, String> keyAssociations = new HashMap<>();
+    private static void load() {
+        try {
+            Type map = new TypeToken<Map<String, String>>() {}.getType();
+            Map<String, String> temp = (new Gson().fromJson(new InputStreamReader(new FileInputStream("ecus.json")), map));
+            keyAssociations = new HashMap<>(temp);
+        } catch (Throwable e) {
+            PUDSCLI.exception(e);
+        }
+    }
+    private static void save() {
+        try {
+            new Gson().toJson(keyAssociations, new OutputStreamWriter(new FileOutputStream("ecus.json")));
+        } catch (Throwable e) {
+            PUDSCLI.exception(e);
+        }
+    }
+    static {
+        load();
+    }
+
+    private static String hash(String input) {
+        try {
+            byte[] bytesOfMessage = input.getBytes(StandardCharsets.UTF_8);
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] theMD5digest = md.digest(bytesOfMessage);
+            StringBuilder sb = new StringBuilder();
+            for (byte b : theMD5digest) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (Exception ex) {
+            PUDSCLI.exception(ex);
+            throw new RuntimeException("No MD5?");
+        }
+    }
     @Override
-    public void execute(PUDSCLI cli, String[] args) {
-        if(!CommandHelper.exactArgs(args, CommandHelper.FAULT_ARGS, 2))
-            return;
-        AbstractAdapter adapter = cli.getAdapter();
+    public void execute(PUDSCLI cli, String[] args_) {
         if(!CommandHelper.needAdapter(cli, CommandHelper.FAULT_ADAPTER))
             return;
         try {
             var diag = cli.processUDS("1003");
             if(!diag.processed() || diag.ret().startsWith("7F"))
                 throw new RuntimeException("Opening diagnostic session failed.");
+
+
+            var swZone = cli.processUDS("22F195"); // read zone F195
+            if(!swZone.processed()) {
+                throw new RuntimeException("Failed to read software version zone.");
+            }
+            String swHash = hash(swZone.ret());
+
+            String[] args = args_;
+            if(args.length == 1) {
+                String seed = keyAssociations.get(swHash);
+                if(seed == null) {
+                    throw new RuntimeException("Couldn't find associated unlocking key.");
+                }
+                args = new String[] {args_[0], seed};
+            }
+
             var unlock = cli.processUDS("2703");
             if(!unlock.processed() || unlock.ret().startsWith("7F"))
                 throw new RuntimeException("Preparing unlock failed.");
@@ -67,6 +130,9 @@ public class UnlockCommand implements Command {
                 throw new RuntimeException("Key was invalid or unlocking failed otherwise.");
             }
             System.out.println("\t\tSuccess!");
+
+            keyAssociations.put(swHash, args_[1]);
+            save();
         } catch (Throwable e) {
             PUDSCLI.exception(e);
             System.out.println("\tUnlocking generically failed.");
