@@ -9,4 +9,7 @@ public abstract class AbstractAdapter {
     public abstract boolean isInitialized();
     public abstract void selectECU(String code);
     public abstract Future<String> sendUDS(String uds);
+
+    public abstract String getECU();
+    public abstract String getArgs();
 }

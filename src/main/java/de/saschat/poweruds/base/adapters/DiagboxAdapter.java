@@ -136,4 +136,14 @@ public class DiagboxAdapter extends AbstractAdapter {
         });
     }
 
+    @Override
+    public String getECU() {
+        return ecuDescriptor;
+    }
+
+    @Override
+    public String getArgs() {
+        return "";
+    }
+
 }
