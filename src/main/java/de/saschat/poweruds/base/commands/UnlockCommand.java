@@ -66,7 +66,10 @@ public class UnlockCommand implements Command {
     }
     private static void save() {
         try {
-            new Gson().toJson(keyAssociations, new OutputStreamWriter(new FileOutputStream("ecus.json")));
+            var x = new OutputStreamWriter(new FileOutputStream("ecus.json"));
+            new Gson().toJson(keyAssociations, x);
+            x.flush();
+            x.close();
         } catch (Throwable e) {
             PUDSCLI.exception(e);
         }
@@ -116,6 +119,7 @@ public class UnlockCommand implements Command {
             }
 
             var unlock = cli.processUDS("2703");
+            System.out.println(unlock);
             if(!unlock.processed() || unlock.ret().startsWith("7F"))
                 throw new RuntimeException("Preparing unlock failed.");
             var seed = unlock.ret().substring(4); // seed
@@ -131,7 +135,7 @@ public class UnlockCommand implements Command {
             }
             System.out.println("\t\tSuccess!");
 
-            keyAssociations.put(swHash, args_[1]);
+            keyAssociations.put(swHash, args[1]);
             save();
         } catch (Throwable e) {
             PUDSCLI.exception(e);
