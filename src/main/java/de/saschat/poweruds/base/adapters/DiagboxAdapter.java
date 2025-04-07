@@ -29,6 +29,9 @@ public class DiagboxAdapter extends AbstractAdapter {
 
     @Override
     public void initialize(String options) throws AdapterInitializationException {
+        if(vciProcess != null && vciProcess.isAlive()) {
+            vciProcess.destroyForcibly();
+        }
         try {
             ProcessBuilder builder = new ProcessBuilder();
             builder.command("vciproxy");

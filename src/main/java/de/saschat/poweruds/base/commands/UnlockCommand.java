@@ -93,6 +93,14 @@ public class UnlockCommand implements Command {
             throw new RuntimeException("No MD5?");
         }
     }
+
+    private static void sleep() {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
     @Override
     public void execute(PUDSCLI cli, String[] args_) {
         if(!CommandHelper.needAdapter(cli, CommandHelper.FAULT_ADAPTER))
@@ -101,12 +109,13 @@ public class UnlockCommand implements Command {
             var diag = cli.processUDS("1003");
             if(!diag.processed() || diag.ret().startsWith("7F"))
                 throw new RuntimeException("Opening diagnostic session failed.");
-
+            sleep();
 
             var swZone = cli.processUDS("22F195"); // read zone F195
             if(!swZone.processed()) {
                 throw new RuntimeException("Failed to read software version zone.");
             }
+            sleep();
             String swHash = hash(swZone.ret());
 
             String[] args = args_;
@@ -119,6 +128,7 @@ public class UnlockCommand implements Command {
             }
 
             var unlock = cli.processUDS("2703");
+            sleep();
             System.out.println(unlock);
             if(!unlock.processed() || unlock.ret().startsWith("7F"))
                 throw new RuntimeException("Preparing unlock failed.");
