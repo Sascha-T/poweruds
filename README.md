@@ -11,5 +11,5 @@ Contributions for alternative adapters (Support for [Arduino](https://github.com
 
 ## Use!
 Run `gradlew run --console=plain`. \
-You must now choose the adapter via `.adapter diagbox`, and subsequently the ECU with `.ecu TXH:RXH` (ex. `.ecu 752:652` for BSI). \ 
+You must now choose the adapter via `.adapter diagbox`, and subsequently the ECU with `.ecu TXH:RXH` (ex. `.ecu 752:652` for BSI). \
 After this setup, you may begin to send UDS commands, and be assisted in unlocking the ECU (SA level 3) with `.unlock CODE`.
