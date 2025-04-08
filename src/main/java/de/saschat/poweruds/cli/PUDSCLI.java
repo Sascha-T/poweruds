@@ -46,6 +46,11 @@ public class PUDSCLI {
             if (line.startsWith(".")) {
                 processCommand(line.substring(1));
             } else {
+                if (line.length() % 2 == 1) {
+                    System.out.println("## LINE REJECTED");
+                    continue;
+                }
+
                 UDSExecution x = processUDS(line);
                 if (x.processed())
                     System.out.println(x.ret());
@@ -88,6 +93,8 @@ public class PUDSCLI {
                 writer.write(adapter.getArgs());
                 writer.newLine();
             }
+            writer.flush();
+            writer.close();
         } catch (Throwable e) {
             exception(e);
         }

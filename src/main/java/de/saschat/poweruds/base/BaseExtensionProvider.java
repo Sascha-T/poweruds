@@ -12,7 +12,7 @@ import de.saschat.poweruds.spi.ExtensionProvider;
 public class BaseExtensionProvider implements ExtensionProvider {
     @Override
     public void provideAdapters(PowerUDS uds) {
-        uds.register(new DiagboxAdapter());
+        uds.register("diagbox", DiagboxAdapter::new);
     }
 
     @Override

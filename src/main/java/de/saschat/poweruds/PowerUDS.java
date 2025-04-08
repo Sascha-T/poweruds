@@ -7,6 +7,7 @@ import de.saschat.poweruds.cli.PUDSCLI;
 import de.saschat.poweruds.spi.ExtensionProvider;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public class PowerUDS {
     private static final ServiceLoader<ExtensionProvider> LOADER = ServiceLoader.load(ExtensionProvider.class);
@@ -35,15 +36,15 @@ public class PowerUDS {
         cli.run(args);
     }
 
-    private Map<String, AbstractAdapter> ADAPTERS = new HashMap<>();
-    public void register(AbstractAdapter diagboxAdapter) {
-        ADAPTERS.put(diagboxAdapter.getName(), diagboxAdapter);
+    private Map<String, Supplier<AbstractAdapter>> ADAPTERS = new HashMap<>();
+    public void register(String name, Supplier<AbstractAdapter> adp) {
+        ADAPTERS.put(name, adp);
     }
     public AbstractAdapter getAdapter(String id) {
-        return ADAPTERS.get(id);
+        return ADAPTERS.get(id).get();
     }
 
-    public Collection<AbstractAdapter> getAdapters() {
-        return Collections.unmodifiableCollection(ADAPTERS.values());
+    public Collection<String> getAdapters() {
+        return Collections.unmodifiableCollection(ADAPTERS.keySet());
     }
 }

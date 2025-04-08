@@ -125,6 +125,7 @@ public class DiagboxAdapter extends AbstractAdapter {
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
+        openSession = true;
     }
 
     @Override
@@ -133,6 +134,7 @@ public class DiagboxAdapter extends AbstractAdapter {
             throw new RuntimeException("Adapter not initialized");
         if(ecuDescriptor == null)
             throw new RuntimeException("ECU descriptor not set");
+        openSession = true;
         return exec.submit(() -> {
             String text = sendCommand("write_and_read", _DESC(ecuDescriptor), uds, "1000");
             return text.split("\\|")[2];

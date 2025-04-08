@@ -10,8 +10,8 @@ public class AdapterCommand implements Command {
     @Override
     public void execute(PUDSCLI cli, String[] args) {
         if(args.length == 1) {
-            for (AbstractAdapter adapter : cli.getParent().getAdapters()) {
-                System.out.println("\t" + adapter.getClass().getName() + ": " + adapter.getName());
+            for (String adapter : cli.getParent().getAdapters()) {
+                System.out.println("\t" + adapter);
             }
             return;
         }
